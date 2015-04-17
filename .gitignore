@@ -1,0 +1,18 @@
+# Ignore the obj folder
+obj/
+
+# Ignore the bin folder
+bin/
+
+# Ignore the temporary Visual Studio files
+*.user
+*.suo
+
+# Ignore Notepad++ backup files
+*.bak
+
+# Ignore map files
+*.js.map
+
+# Ignore JavaScript files
+*.js

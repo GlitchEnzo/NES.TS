@@ -1,0 +1,160 @@
+﻿/* 
+    Static: Default layout. 
+    Fixed: Fixed relative to browser window.  Removed from layout.
+    Relative: Relative to IT'S OWN normal layout position.  Normal position used in layout.
+    Absolute: Relative to first parent that is NOT Static (<html> if none found).  Removed from layout.
+*/
+
+* {
+    margin: 0; 
+    padding: 0;
+}
+			
+body {
+	font-family: sans-serif;
+	font-size: 1.3em;
+}
+			
+#header {
+	background: linear-gradient(black, black, black, black, black, #00bbff);
+	padding: 0.3em 1em;
+    position: relative;
+}
+
+#currentFolder {
+    color: white;
+}
+
+#searchbox {
+    right: 5px;
+    position: absolute;
+}
+ 
+#scroller {
+    background: gray;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+}
+            
+#thelist {
+	font-size: 0.9em;
+	height: 1200px; /* make it really big so it is offscreen at first */
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+			
+#thelist li {
+	background: white;
+	border-bottom: 1px solid #e7e7e7;
+	padding: 0.6em 0.3em;
+}
+			
+#thelist li:hover {
+	color: #fff;
+	background: #00bbff;
+}
+            
+#footer {
+    background: linear-gradient(to top, black, black, black, black, black, black, #00bbff);
+	text-align: center;
+	color: #fff;
+}
+			
+#progressBar {
+	-webkit-appearance:none; /* Tell WebKit not to apply any default style */
+	-moz-apperance:none;  /* Tell Firefox not to apply any default style */
+	width:95%; 
+	height:8px; 
+	background:#00bbff;
+	outline: none; /* Disables blue outline that occurs on Chrome */
+}
+			
+#progressBar::-webkit-slider-thumb {
+    -webkit-appearance:none; 
+    -moz-apperance:none; 
+    width:16px; 
+    height:16px;
+    border-radius:8px;
+    background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(0.49, #dddddd), color-stop(0.51, #d1d1d1), color-stop(1, #a1a1a1) );
+}
+
+#volumeBar {
+    position: fixed;
+    bottom: 30px;
+    left: 10%;
+	-webkit-appearance:none; 
+	-moz-apperance:none; 
+	width:15%; 
+	height:5px; 
+	background:#0088ff;
+	outline: none; /* Disables blue outline that occurs on Chrome */
+}
+			
+#volumeBar::-webkit-slider-thumb {
+    -webkit-appearance:none; 
+    -moz-apperance:none; 
+    width:12px; 
+    height:12px;
+    border-radius:8px;
+    background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(0.49, #dddddd), color-stop(0.51, #d1d1d1), color-stop(1, #a1a1a1) );
+}
+            
+#prevButton {
+    width:0px; 
+    height:0px; 
+    border-top: 25px solid transparent;
+    border-right: 50px solid gray;
+    border-bottom: 25px solid transparent;
+    display:inline-block;
+}
+            
+#prevButton:hover {
+    border-right: 50px solid white;
+}
+            
+#playButton {
+    width:50px; 
+    height:50px; 
+    border-radius:25px;
+    margin-top: 0px;
+    /*background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(0.49, #dddddd), color-stop(0.51, #d1d1d1), color-stop(1, #a1a1a1) );*/
+    /*background: linear-gradient(#fefefe, #dddddd, #d1d1d1, #a1a1a1);*/
+    background: gray;
+    display:inline-block;
+}
+            
+#playButton:hover {
+    background: white;
+}
+            
+#nextButton {
+    width:0px; 
+    height:0px; 
+    border-top: 25px solid transparent;
+    border-left: 50px solid gray;
+    border-bottom: 25px solid transparent;
+    /*background: linear-gradient(#fefefe, #dddddd, #d1d1d1, #a1a1a1);*/
+    display:inline-block;
+}
+            
+#nextButton:hover {
+    border-left: 50px solid white;
+}
+
+#currentTime {
+    position: fixed;
+    left: 5px;
+    bottom: 5px;
+    color: #fff;
+    font-size: 2.0em;
+}
+
+#duration {
+    position: fixed;
+    right: 5px;
+    bottom: 5px;
+    color: #fff;
+    font-size: 2.0em;
+}
