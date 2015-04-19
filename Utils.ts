@@ -1,6 +1,6 @@
 module NES.TS
 { 
-    class Utils
+    export class Utils
     {
         static copyArrayElements(src, srcPos, dest, destPos, length) 
         {
@@ -30,7 +30,7 @@ module NES.TS
     
         static toJSON(obj)
         {
-            var state = {};
+            var state;
             for (var i = 0; i < obj.JSON_PROPERTIES.length; i++)
             {
                 state[obj.JSON_PROPERTIES[i]] = obj[obj.JSON_PROPERTIES[i]];
