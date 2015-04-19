@@ -186,12 +186,17 @@ module NES.TS {
         }
 
         mapperSupported() {
-            return typeof JSNES.Mappers[this.mapperType] !== 'undefined';
+            return this.mapperType == 0 || this.mapperType == 1 || this.mapperType == 2 || this.mapperType == 4;
         }
 
         createMapper() {
             if (this.mapperSupported()) {
-                return new JSNES.Mappers[this.mapperType](this.nes);
+                switch (this.mapperType) {
+                    case 0: return new MapperZero(this.nes);
+                    case 1: return new MapperOne(this.nes);
+                    case 2: return new MapperTwo(this.nes);
+                    case 4: return new MapperFour(this.nes);
+                }
             }
             else {
                 this.nes.ui.updateStatus("This ROM uses a mapper not supported by JSNES: " + this.getMapperName() + "(" + this.mapperType + ")");
