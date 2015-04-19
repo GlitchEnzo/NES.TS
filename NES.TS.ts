@@ -65,4 +65,17 @@ window.onload = () =>
     currentTime = document.getElementById('currentTime');
     duration = document.getElementById('duration');
     volumeBar = <HTMLInputElement>document.getElementById('volumeBar');
+
+    var emulator = <HTMLDivElement>document.getElementById('emulator');
+
+    var nes = new NES.TS.NES(
+        {
+            'ui': new NES.TS.UI(emulator,
+                {
+                    "Homebrew": [
+                        ['Concentration Room', 'roms/croom/croom.nes'],
+                        ['LJ65', 'roms/lj65/lj65.nes'],
+                    ]
+                }, null)
+        });
 };
