@@ -36,9 +36,8 @@ module NES.TS {
         canvasImageData;
         dynamicaudio;
 
-        constructor(parent: HTMLDivElement, roms, nes) {
+        constructor(parent: HTMLDivElement, roms) {
             var self = this;
-            self.nes = nes;
 
             /*
              * Create UI
@@ -173,30 +172,34 @@ module NES.TS {
             /*
              * Canvas
              */
-            self.canvasContext = self.screen[0].getContext('2d');
+            self.canvasContext = self.screen.getContext('2d');
             self.canvasImageData = self.canvasContext.getImageData(0, 0, 256, 240);
             self.resetCanvas();
+        }
+
+        setNes(nes) {
+            this.nes = nes;
 
             /*
              * Keyboard
              */
             document.onkeydown = (evt) => {
-                self.nes.keyboard.keyDown(evt);
+                this.nes.keyboard.keyDown(evt);
             };
 
             document.onkeyup = (evt) => {
-                self.nes.keyboard.keyUp(evt);
+                this.nes.keyboard.keyUp(evt);
             };
 
             document.onkeypress = (evt) => {
-                self.nes.keyboard.keyPress(evt);
+                this.nes.keyboard.keyPress(evt);
             };
 
             /*
              * Sound
              */
             //self.dynamicaudio = new DynamicAudio({
-            //    swf: nes.opts.swfPath + 'dynamicaudio.swf'
+            //    swf: this.nes.opts.swfPath + 'dynamicaudio.swf'
             //});
         }
 
@@ -277,21 +280,15 @@ module NES.TS {
             for (var groupName in roms) {
                 if (roms.hasOwnProperty(groupName)) {
                     var optgroup = document.createElement("optgroup");
-                    var attr = new Attr();
-                    attr.name = "label";
-                    attr.value = groupName;
-                    optgroup.attributes.setNamedItem(attr);
+                    optgroup.setAttribute("label", groupName);
+
                     for (var i = 0; i < roms[groupName].length; i++) {
                         option = document.createElement("option");
                         option.innerText = roms[groupName][i][0];
-
-                        attr = new Attr();
-                        attr.name = "value";
-                        attr.value = roms[groupName][i][1];
-                        option.attributes.setNamedItem(attr);
-
+                        option.setAttribute("value", roms[groupName][i][1]);
                         optgroup.appendChild(option);
                     }
+
                     this.romSelect.appendChild(optgroup);
                 }
             }

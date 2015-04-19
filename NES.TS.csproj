@@ -27,6 +27,7 @@
     <Content Include="lib\jquery.dimensions.min.js" />
     <Content Include="NES.TS.css" />
     <Content Include="index.html" />
+    <TypeScriptCompile Include="Options.ts" />
     <TypeScriptCompile Include="PAPU.ts" />
     <TypeScriptCompile Include="PPU.ts" />
     <TypeScriptCompile Include="ROM.ts" />

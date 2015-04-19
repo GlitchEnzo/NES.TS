@@ -8,21 +8,8 @@
 /// <reference path="ROM.ts" />
 /// <reference path="UI.ts" />
 
-var thelist: HTMLElement;
-var header: HTMLElement;
-var footer: HTMLElement;
-var songTitle: HTMLElement;
-var currentFolder: HTMLElement;
-var progressBar: HTMLInputElement;
-var searchbox: HTMLInputElement;
-var currentTime: HTMLElement;
-var duration: HTMLElement;
-var volumeBar: HTMLInputElement;
-
 window.onresize = () =>
 {
-    // The size of the header and footer are fixed.  The list should take up all remaining space.
-    thelist.style.height = window.innerHeight - header.clientHeight - footer.clientHeight + "px";
 }
 
 //function search(event: KeyboardEvent)
@@ -45,37 +32,29 @@ window.onresize = () =>
 //    playlist.Search(query, true);
 //}
 
-function searchClicked()
-{
-    if (searchbox.value == "Search")
-    {
-        searchbox.value = "";
-    }
-}
+//function searchClicked()
+//{
+//    if (searchbox.value == "Search")
+//    {
+//        searchbox.value = "";
+//    }
+//}
 
 window.onload = () =>
 {
-    thelist = document.getElementById('thelist');
-    header = document.getElementById('header');
-    footer = document.getElementById('footer');
-    songTitle = document.getElementById('songTitle');
-    currentFolder = document.getElementById('currentFolder');
-    progressBar = <HTMLInputElement>document.getElementById('progressBar');
-    searchbox = <HTMLInputElement>document.getElementById('searchbox');
-    currentTime = document.getElementById('currentTime');
-    duration = document.getElementById('duration');
-    volumeBar = <HTMLInputElement>document.getElementById('volumeBar');
-
     var emulator = <HTMLDivElement>document.getElementById('emulator');
 
-    var nes = new NES.TS.NES(
-        {
-            'ui': new NES.TS.UI(emulator,
-                {
-                    "Homebrew": [
-                        ['Concentration Room', 'roms/croom/croom.nes'],
-                        ['LJ65', 'roms/lj65/lj65.nes'],
-                    ]
-                }, null)
-        });
+    var ui = new NES.TS.UI(emulator, {
+        "Homebrew": [
+            ['Concentration Room', 'roms/croom/croom.nes'],
+            ['LJ65', 'roms/lj65/lj65.nes'],
+        ]
+    });
+
+    var options = new NES.TS.Options();
+    options.ui = ui;
+
+    var nes = new NES.TS.NES(options);
+
+    ui.setNes(nes);
 };

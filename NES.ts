@@ -1,7 +1,7 @@
 module NES.TS
 {
     export class NES {
-        opts;
+        opts: Options = new Options();
         isRunning = false;
         fpsFrameCount = 0;
         romData = null;
@@ -21,34 +21,12 @@ module NES.TS
         rom;
         lastFrameTime;
 
-        constructor(opts) {
-            this.opts = {
-                ui: new DummyUI(this),
-                swfPath: 'lib/',
-
-                preferredFrameRate: 60,
-                fpsInterval: 500, // Time between updating FPS in ms
-                showDisplay: true,
-
-                emulateSound: false,
-                sampleRate: 44100, // Sound sample rate in hz
-
-                CPU_FREQ_NTSC: 1789772.5, //1789772.72727272d;
-                CPU_FREQ_PAL: 1773447.4
-            };
-
-            if (typeof opts != 'undefined') {
-                var key;
-                for (key in this.opts) {
-                    if (typeof opts[key] != 'undefined') {
-                        this.opts[key] = opts[key];
-                    }
-                }
-            }
+        constructor(opts: Options) {
+            this.opts = opts;
 
             this.frameTime = 1000 / this.opts.preferredFrameRate;
 
-            this.ui = new this.opts.ui(this);
+            this.ui = this.opts.ui;
             this.cpu = new CPU(this);
             this.ppu = new PPU(this);
             this.papu = new PAPU(this);
