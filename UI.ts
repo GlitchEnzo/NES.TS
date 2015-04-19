@@ -1,10 +1,18 @@
-JSNES.DummyUI = function(nes) {
-    this.nes = nes;
-    this.enable = function() {};
-    this.updateStatus = function() {};
-    this.writeAudio = function() {};
-    this.writeFrame = function() {};
-};
+module NES.TS {
+    export class DummyUI {
+        nes;
+
+        constructor(nes)
+        {
+            this.nes = nes;
+        }
+
+        enable() { }
+        updateStatus() { }
+        writeAudio() { }
+        writeFrame() { }
+    }
+}
 
 if (typeof jQuery !== 'undefined') {
     (function($) {
@@ -175,18 +183,7 @@ if (typeof jQuery !== 'undefined') {
                         },
                         complete: function(xhr, status) {
                             var i, data;
-                            if (JSNES.Utils.isIE()) {
-                                var charCodes = JSNESBinaryToArray(
-                                    xhr.responseBody
-                                ).toArray();
-                                data = String.fromCharCode.apply(
-                                    undefined, 
-                                    charCodes
-                                );
-                            }
-                            else {
-                                data = xhr.responseText;
-                            }
+                            data = xhr.responseText;
                             self.nes.loadRom(data);
                             self.nes.start();
                             self.enable();

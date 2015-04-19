@@ -23,7 +23,7 @@ module NES.TS
 
         constructor(opts) {
             this.opts = {
-                ui: DummyUI,
+                ui: new DummyUI(this),
                 swfPath: 'lib/',
 
                 preferredFrameRate: 60,
