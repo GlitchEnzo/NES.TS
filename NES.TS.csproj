@@ -18,6 +18,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="CPU.ts" />
+    <TypeScriptCompile Include="DynamicAudio.d.ts" />
     <TypeScriptCompile Include="Keyboard.ts" />
     <TypeScriptCompile Include="Mappers.ts" />
     <TypeScriptCompile Include="NES.ts" />

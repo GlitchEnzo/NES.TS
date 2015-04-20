@@ -1,24 +1,4 @@
 module NES.TS {
-    export class DummyUI {
-        nes;
-
-        constructor(nes)
-        {
-            this.nes = nes;
-        }
-
-        enable() { }
-        updateStatus() { }
-        writeAudio() { }
-        writeFrame() { }
-    }
-
-    export class RealUI {
-        constructor(roms) {
-
-        }
-    }
-
     export class UI {
         nes;
         root: HTMLDivElement;
@@ -34,7 +14,7 @@ module NES.TS {
         zoomed = false;
         canvasContext: CanvasRenderingContext2D;
         canvasImageData;
-        dynamicaudio;
+        dynamicaudio: DynamicAudio;
 
         constructor(parent: HTMLDivElement, roms) {
             var self = this;
@@ -194,9 +174,9 @@ module NES.TS {
             /*
              * Sound
              */
-            //self.dynamicaudio = new DynamicAudio({
-            //    swf: this.nes.opts.swfPath + 'dynamicaudio.swf'
-            //});
+            this.dynamicaudio = new DynamicAudio({
+                swf: this.nes.opts.swfPath + 'dynamicaudio.swf'
+            });
         }
 
         loadROM() {
