@@ -4,6 +4,8 @@ module NES.TS
     {
         nes = null;
         mem = null;
+
+        // Registers
         REG_ACC = null;
         REG_X = null;
         REG_Y = null;
@@ -11,6 +13,8 @@ module NES.TS
         REG_PC = null;
         REG_PC_NEW = null;
         REG_STATUS = null;
+
+        // Flags
         F_CARRY = null;
         F_DECIMAL = null;
         F_INTERRUPT = null;
@@ -22,6 +26,7 @@ module NES.TS
         F_NOTUSED_NEW = null;
         F_BRK = null;
         F_BRK_NEW = null;
+
         opdata = null;
         cyclesToHalt = null;
         crash = null;

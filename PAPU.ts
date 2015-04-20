@@ -1,4 +1,11 @@
 module NES.TS {
+    /*
+    * Pseuedo-Audio Processing Unit: Used for sound. The NES
+    *         contains five (5) audio channels: four (4) analogue, and one
+    *         (1) digital. There is no physical APU IC in the NES, as the
+    *         system is analogue, not digital. All analogue circuitry is
+    *         kept within the CPU.
+    */
     export class PAPU {
         nes;
 

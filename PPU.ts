@@ -1,4 +1,8 @@
 module NES.TS {
+    /*
+    * Picture Processing Unit: Used to control graphics, sprites,
+    *         and other video-oriented features.
+    */
     export class PPU {
         nes;
         vramMem = null;
