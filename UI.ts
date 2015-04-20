@@ -14,7 +14,6 @@ module NES.TS {
         zoomed = false;
         canvasContext: CanvasRenderingContext2D;
         canvasImageData;
-        dynamicaudio: DynamicAudio;
         audioPlayer: AudioPlayer;
 
         constructor(parent: HTMLDivElement, roms) {
@@ -152,6 +151,11 @@ module NES.TS {
             self.canvasContext = self.screen.getContext('2d');
             self.canvasImageData = self.canvasContext.getImageData(0, 0, 256, 240);
             self.resetCanvas();
+
+            /*
+             * Sound
+             */
+            this.audioPlayer = new AudioPlayer();
         }
 
         setNes(nes) {
@@ -171,15 +175,6 @@ module NES.TS {
             document.onkeypress = (evt) => {
                 this.nes.keyboard.keyPress(evt);
             };
-
-            /*
-             * Sound
-             */
-            this.dynamicaudio = new DynamicAudio({
-                swf: this.nes.opts.swfPath + 'dynamicaudio.swf'
-            });
-
-            this.audioPlayer = new AudioPlayer();
         }
 
         loadROM() {
@@ -276,7 +271,6 @@ module NES.TS {
         }
 
         writeAudio(samples) {
-            //return this.dynamicaudio.writeInt(samples);
             this.audioPlayer.playInts(samples);
         }
 

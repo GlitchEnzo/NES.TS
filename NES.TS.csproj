@@ -19,12 +19,9 @@
   <ItemGroup>
     <TypeScriptCompile Include="AudioPlayer.ts" />
     <TypeScriptCompile Include="CPU.ts" />
-    <TypeScriptCompile Include="DynamicAudio.d.ts" />
     <TypeScriptCompile Include="Keyboard.ts" />
     <TypeScriptCompile Include="Mappers.ts" />
     <TypeScriptCompile Include="NES.ts" />
-    <Content Include="lib\dynamicaudio-min.js" />
-    <Content Include="lib\dynamicaudio.swf" />
     <Content Include="NES.TS.css" />
     <Content Include="index.html" />
     <TypeScriptCompile Include="Options.ts" />
