@@ -32,7 +32,7 @@ module NES.TS {
         zoomButton: HTMLInputElement;
         status: HTMLParagraphElement;
         zoomed = false;
-        canvasContext;
+        canvasContext: CanvasRenderingContext2D;
         canvasImageData;
         dynamicaudio;
 
@@ -94,53 +94,49 @@ module NES.TS {
             /*
              * Buttons
              */
-            //self.pauseButton.onclick = function () {
-            //    if (self.nes.isRunning) {
-            //        self.nes.stop();
-            //        self.updateStatus("Paused");
-            //        self.pauseButton.attr("value", "resume");
-            //    }
-            //    else {
-            //        self.nes.start();
-            //        self.pauseButton.attr("value", "pause");
-            //    }
-            //};
+            self.pauseButton.onclick = () => {
+                if (self.nes.isRunning) {
+                    self.nes.stop();
+                    self.updateStatus("Paused");
+                    self.pauseButton.setAttribute("value", "resume");
+                }
+                else {
+                    self.nes.start();
+                    self.pauseButton.setAttribute("value", "pause");
+                }
+            };
 
-            //self.buttons.restart.click(function () {
-            //    self.nes.reloadRom();
-            //    self.nes.start();
-            //});
+            self.restartButton.onclick = () => {
+                self.nes.reloadRom();
+                self.nes.start();
+            };
 
-            //self.buttons.sound.click(function () {
-            //    if (self.nes.opts.emulateSound) {
-            //        self.nes.opts.emulateSound = false;
-            //        self.buttons.sound.attr("value", "enable sound");
-            //    }
-            //    else {
-            //        self.nes.opts.emulateSound = true;
-            //        self.buttons.sound.attr("value", "disable sound");
-            //    }
-            //});
+            self.soundButton.onclick = () => {
+                if (self.nes.opts.emulateSound) {
+                    self.nes.opts.emulateSound = false;
+                    self.soundButton.setAttribute("value", "enable sound");
+                }
+                else {
+                    self.nes.opts.emulateSound = true;
+                    self.soundButton.setAttribute("value", "disable sound");
+                }
+            };
 
-            //self.zoomed = false;
-            //self.buttons.zoom.click(function () {
-            //    if (self.zoomed) {
-            //        self.screen.animate({
-            //            width: '256px',
-            //            height: '240px'
-            //        });
-            //        self.buttons.zoom.attr("value", "zoom in");
-            //        self.zoomed = false;
-            //    }
-            //    else {
-            //        self.screen.animate({
-            //            width: '512px',
-            //            height: '480px'
-            //        });
-            //        self.buttons.zoom.attr("value", "zoom out");
-            //        self.zoomed = true;
-            //    }
-            //});
+            self.zoomed = false;
+            self.zoomButton.onclick = () => {
+                if (self.zoomed) {
+                    self.screen.style.width = "256px";
+                    self.screen.style.height = "240px";
+                    self.zoomButton.setAttribute("value", "zoom in");
+                    self.zoomed = false;
+                }
+                else {
+                    self.screen.style.width = "512px";
+                    self.screen.style.height = "480px";
+                    self.zoomButton.setAttribute("value", "zoom out");
+                    self.zoomed = true;
+                }
+            };
 
             /*
              * Lightgun experiments with mouse
@@ -237,7 +233,7 @@ module NES.TS {
         * nes.ui.screenshot() --> return <img> element :)
         */
         screenshot() {
-            var data = this.screen[0].toDataURL("image/png"),
+            var data = this.screen.toDataURL("image/png"),
                 img = new Image();
             img.src = data;
             return img;
@@ -247,20 +243,22 @@ module NES.TS {
         * Enable and reset UI elements
         */
         enable() {
-            //this.buttons.pause.attr("disabled", null);
-            //if (this.nes.isRunning) {
-            //    this.buttons.pause.attr("value", "pause");
-            //}
-            //else {
-            //    this.buttons.pause.attr("value", "resume");
-            //}
-            //this.buttons.restart.attr("disabled", null);
-            //if (this.nes.opts.emulateSound) {
-            //    this.buttons.sound.attr("value", "disable sound");
-            //}
-            //else {
-            //    this.buttons.sound.attr("value", "enable sound");
-            //}
+            //this.pauseButton.setAttribute("disabled", null);
+            if (this.nes.isRunning) {
+                this.pauseButton.setAttribute("value", "pause");
+            }
+            else {
+                this.pauseButton.setAttribute("value", "resume");
+            }
+
+            //this.restartButton.setAttribute("disabled", null);
+
+            if (this.nes.opts.emulateSound) {
+                this.soundButton.setAttribute("value", "disable sound");
+            }
+            else {
+                this.soundButton.setAttribute("value", "enable sound");
+            }
         }
 
         updateStatus(s) {
@@ -312,7 +310,7 @@ module NES.TS {
                     imageData[j + 2] = (pixel >> 16) & 0xFF;
                     prevBuffer[i] = pixel;
                 }
-            }
+            }            
 
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
         }
