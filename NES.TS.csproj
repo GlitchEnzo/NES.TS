@@ -23,8 +23,6 @@
     <TypeScriptCompile Include="NES.ts" />
     <Content Include="lib\dynamicaudio-min.js" />
     <Content Include="lib\dynamicaudio.swf" />
-    <Content Include="lib\jquery-1.4.2.min.js" />
-    <Content Include="lib\jquery.dimensions.min.js" />
     <Content Include="NES.TS.css" />
     <Content Include="index.html" />
     <TypeScriptCompile Include="Options.ts" />
