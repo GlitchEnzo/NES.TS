@@ -15,6 +15,7 @@ module NES.TS {
         canvasContext: CanvasRenderingContext2D;
         canvasImageData;
         dynamicaudio: DynamicAudio;
+        audioPlayer: AudioPlayer;
 
         constructor(parent: HTMLDivElement, roms) {
             var self = this;
@@ -177,6 +178,8 @@ module NES.TS {
             this.dynamicaudio = new DynamicAudio({
                 swf: this.nes.opts.swfPath + 'dynamicaudio.swf'
             });
+
+            this.audioPlayer = new AudioPlayer();
         }
 
         loadROM() {
@@ -273,7 +276,8 @@ module NES.TS {
         }
 
         writeAudio(samples) {
-            return this.dynamicaudio.writeInt(samples);
+            //return this.dynamicaudio.writeInt(samples);
+            this.audioPlayer.playInts(samples);
         }
 
         writeFrame(buffer, prevBuffer) {
