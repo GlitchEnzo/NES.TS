@@ -14,7 +14,6 @@ module NES.TS {
         zoomed = false;
         canvasContext: CanvasRenderingContext2D;
         canvasImageData;
-        audioPlayer: AudioPlayer;
 
         constructor(parent: HTMLDivElement, roms) {
             var self = this;
@@ -151,11 +150,6 @@ module NES.TS {
             self.canvasContext = self.screen.getContext('2d');
             self.canvasImageData = self.canvasContext.getImageData(0, 0, 256, 240);
             self.resetCanvas();
-
-            /*
-             * Sound
-             */
-            this.audioPlayer = new AudioPlayer();
         }
 
         setNes(nes) {
@@ -268,10 +262,6 @@ module NES.TS {
                     this.romSelect.appendChild(optgroup);
                 }
             }
-        }
-
-        writeAudio(samples) {
-            this.audioPlayer.playInts(samples);
         }
 
         writeFrame(buffer, prevBuffer) {

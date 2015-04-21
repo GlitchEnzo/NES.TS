@@ -8,6 +8,7 @@ module NES.TS {
     */
     export class PAPU {
         nes;
+        audioPlayer: AudioPlayer;
 
         square1;
         square2;
@@ -20,6 +21,7 @@ module NES.TS {
         initCounter = 2048;
         channelEnableValue = null;
 
+        //bufferSize = 4096;
         bufferSize = 8192;
         bufferIndex = 0;
         sampleRate = 44100;
@@ -88,6 +90,7 @@ module NES.TS {
 
         constructor(nes) {
             this.nes = nes;
+            this.audioPlayer = new AudioPlayer();
 
             this.square1 = new ChannelSquare(this, true);
             this.square2 = new ChannelSquare(this, false);
@@ -634,7 +637,7 @@ module NES.TS {
 
             // Write full buffer
             if (this.bufferIndex === this.sampleBuffer.length) {
-                this.nes.ui.writeAudio(this.sampleBuffer);
+                this.audioPlayer.playInts(this.sampleBuffer);
                 this.sampleBuffer = new Array(this.bufferSize * 2);
                 this.bufferIndex = 0;
             }
