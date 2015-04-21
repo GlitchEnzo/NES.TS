@@ -1,3 +1,20 @@
+interface HTMLCanvasElement {
+    requestFullscreen();
+    webkitRequestFullscreen();
+    mozRequestFullScreen();
+}
+
+interface Document {
+    onfullscreenchange: (ev: any) => any;
+    onwebkitfullscreenchange: (ev: any) => any;
+
+    fullscreenEnabled: boolean;
+    webkitFullscreenEnabled: boolean;
+
+    fullscreenElement: Element;
+    webkitFullscreenElement: Element;
+}
+
 module NES.TS {
     export class UI {
         nes;
@@ -10,6 +27,7 @@ module NES.TS {
         restartButton: HTMLInputElement;
         soundButton: HTMLInputElement;
         zoomButton: HTMLInputElement;
+        fullscreenButton: HTMLInputElement;
         status: HTMLParagraphElement;
         zoomed = false;
         canvasContext: CanvasRenderingContext2D;
@@ -59,6 +77,11 @@ module NES.TS {
             self.zoomButton.type = "button";
             self.zoomButton.value = "zoom in";
             self.controls.appendChild(self.zoomButton);
+
+            self.fullscreenButton = document.createElement("input");
+            self.fullscreenButton.type = "button";
+            self.fullscreenButton.value = "fullscreen";
+            self.controls.appendChild(self.fullscreenButton);
 
             self.status = document.createElement("p");
             self.root.appendChild(self.status);
@@ -115,6 +138,30 @@ module NES.TS {
                     self.zoomButton.setAttribute("value", "zoom out");
                     self.zoomed = true;
                 }
+            };
+
+            document.onwebkitfullscreenchange = () => {
+                //console.log("Fullscreen changed: " + document.webkitFullscreenElement != null);
+                if (document.webkitFullscreenElement != null) {
+                    var scale = screen.height / 240;
+                    console.log("Scale = " + scale);
+                    self.screen.style.width = 256 * scale + "px";
+                    self.screen.style.height = 240 * scale + "px";
+                }
+                else {
+                    if (!self.zoomed) {
+                        self.screen.style.width = "256px";
+                        self.screen.style.height = "240px";
+                    }
+                    else {
+                        self.screen.style.width = "512px";
+                        self.screen.style.height = "480px";
+                    }
+                }
+            }
+
+            self.fullscreenButton.onclick = () => {
+                self.screen.webkitRequestFullscreen();
             };
 
             /*
