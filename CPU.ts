@@ -2,17 +2,17 @@ module NES.TS
 {
     export class CPU
     {
-        nes = null;
-        mem = null;
+        nes: NES;
+        mem: number[];
 
         // Registers
-        REG_ACC = null;
-        REG_X = null;
-        REG_Y = null;
-        REG_SP = null;
-        REG_PC = null;
-        REG_PC_NEW = null;
-        REG_STATUS = null;
+        REG_ACC: number;
+        REG_X: number;
+        REG_Y: number;
+        REG_SP: number;
+        REG_PC: number;
+        REG_PC_NEW: number;
+        REG_STATUS: number;
 
         // Flags
         F_CARRY = null;
@@ -27,18 +27,18 @@ module NES.TS
         F_BRK = null;
         F_BRK_NEW = null;
 
-        opdata = null;
-        cyclesToHalt = null;
-        crash = null;
-        irqRequested = null;
-        irqType = null;
+        opdata: number[];
+        cyclesToHalt: number;
+        crash: boolean;
+        irqRequested: boolean;
+        irqType: number;
 
         // IRQ Types
         IRQ_NORMAL = 0;
         IRQ_NMI = 1;
         IRQ_RESET = 2;
 
-        constructor(nes) 
+        constructor(nes: NES) 
         {
             this.nes = nes;
             this.reset();
@@ -52,6 +52,7 @@ module NES.TS
             for (var i = 0; i < 0x2000; i++) {
                 this.mem[i] = 0xFF;
             }
+
             for (var p = 0; p < 4; p++) {
                 var i = p * 0x800;
                 this.mem[i + 0x008] = 0xF7;
@@ -59,6 +60,7 @@ module NES.TS
                 this.mem[i + 0x00A] = 0xDF;
                 this.mem[i + 0x00F] = 0xBF;
             }
+
             for (var i = 0x2001; i < this.mem.length; i++) {
                 this.mem[i] = 0;
             }
@@ -67,11 +69,14 @@ module NES.TS
             this.REG_ACC = 0;
             this.REG_X = 0;
             this.REG_Y = 0;
+
             // Reset Stack pointer:
             this.REG_SP = 0x01FF;
+
             // Reset Program counter:
             this.REG_PC = 0x8000 - 1;
             this.REG_PC_NEW = 0x8000 - 1;
+
             // Reset Status register:
             this.REG_STATUS = 0x28;
 
@@ -1064,7 +1069,7 @@ module NES.TS
                     // *******
 
                     this.nes.stop();
-                    this.nes.crashMessage = "Game crashed, invalid opcode at address $" + opaddr.toString(16);
+                    console.log("Game crashed, invalid opcode at address $" + opaddr.toString(16));
                     break;
 
                 }
@@ -1075,7 +1080,7 @@ module NES.TS
 
         }
 
-        load(addr) 
+        load(addr: number) 
         {
             if (addr < 0x2000) {
                 return this.mem[addr & 0x7FF];
@@ -1085,7 +1090,7 @@ module NES.TS
             }
         }
 
-        load16bit(addr) 
+        load16bit(addr: number) 
         {
             if (addr < 0x1FFF) {
                 return this.mem[addr & 0x7FF]
@@ -1096,7 +1101,7 @@ module NES.TS
             }
         }
 
-        write(addr, val) 
+        write(addr: number, val: number) 
         {
             if (addr < 0x2000) {
                 this.mem[addr & 0x7FF] = val;
@@ -1106,7 +1111,7 @@ module NES.TS
             }
         }
 
-        requestIrq(type) 
+        requestIrq(type: number) 
         {
             if (this.irqRequested) {
                 if (type == this.IRQ_NORMAL) {
@@ -1118,7 +1123,7 @@ module NES.TS
             this.irqType = type;
         }
 
-        push(value) {
+        push(value: number) {
             this.nes.mmap.write(this.REG_SP, value);
             this.REG_SP--;
             this.REG_SP = 0x0100 | (this.REG_SP & 0xFF);
@@ -1134,15 +1139,15 @@ module NES.TS
             return this.nes.mmap.load(this.REG_SP);
         }
 
-        pageCrossed(addr1, addr2) {
+        pageCrossed(addr1: number, addr2: number) {
             return ((addr1 & 0xFF00) != (addr2 & 0xFF00));
         }
 
-        haltCycles(cycles) {
+        haltCycles(cycles: number) {
             this.cyclesToHalt += cycles;
         }
 
-        doNonMaskableInterrupt(status) {
+        doNonMaskableInterrupt(status: number) {
             if ((this.nes.mmap.load(0x2000) & 128) != 0) { // Check whether VBlank Interrupts are enabled
 
                 this.REG_PC_NEW++;
@@ -1161,7 +1166,7 @@ module NES.TS
             this.REG_PC_NEW--;
         }
 
-        doIrq(status) {
+        doIrq(status: number) {
             this.REG_PC_NEW++;
             this.push((this.REG_PC_NEW >> 8) & 0xFF);
             this.push(this.REG_PC_NEW & 0xFF);
@@ -1184,7 +1189,7 @@ module NES.TS
                 | (this.F_SIGN << 7);
         }
 
-        setStatus(st) {
+        setStatus(st: number) {
             this.F_CARRY = (st) & 1;
             this.F_ZERO = (st >> 1) & 1;
             this.F_INTERRUPT = (st >> 2) & 1;
@@ -1217,17 +1222,16 @@ module NES.TS
     // Generates and provides an array of details about instructions
     export class OpData
     {
-        opdata = null;
-        instname: string[] = null;
+        opdata: number[] = new Array(256);
+        instname: string[] = new Array(56);
         addrDesc: string[] = null;
         cycTable: number[] = null;
 
         constructor()
         {
-            this.opdata = new Array(256);
-
             // Set all to invalid instruction (to detect crashes):
-            for (var i = 0; i < 256; i++) this.opdata[i] = 0xFF;
+            for (var i = 0; i < 256; i++)
+                this.opdata[i] = 0xFF;
 
             // Now fill in all valid opcodes:
 
@@ -1514,8 +1518,6 @@ module NES.TS
             /*0xF0*/ 2, 5, 2, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7
                 );
 
-            this.instname = new Array(56);
-
             // Instruction Names:
             this.instname[0] = "ADC";
             this.instname[1] = "AND";
@@ -1680,7 +1682,7 @@ module NES.TS
         ADDR_POSTIDXIND = 11;
         ADDR_INDABS = 12;
 
-        setOp(inst, op, addr, size, cycles) {
+        setOp(inst: number, op: number, addr: number, size: number, cycles: number) {
             this.opdata[op] =
             ((inst & 0xFF)) |
             ((addr & 0xFF) << 8) |

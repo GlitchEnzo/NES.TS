@@ -2,7 +2,7 @@ module NES.TS
 { 
     export class Utils
     {
-        static copyArrayElements(src, srcPos, dest, destPos, length) 
+        static copyArrayElements(src: any[], srcPos: number, dest: any[], destPos: number, length: number) 
         {
             for (var i = 0; i < length; ++i)
             {
@@ -10,7 +10,7 @@ module NES.TS
             }
         }
     
-        static copyArray(src)
+        static copyArray(src: any[])
         {
             var dest = new Array(src.length);
             for (var i = 0; i < src.length; i++)

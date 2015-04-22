@@ -8,18 +8,18 @@ module NES.TS
         static VERSION = "<%= version %>";
 
         frameTime: number;
-        ui;
-        cpu;
-        ppu;
-        papu;
-        mmap;
-        keyboard;
+        ui: UI;
+        cpu: CPU;
+        ppu: PPU;
+        papu: PAPU;
+        mmap: Mapper;
+        keyboard: Keyboard;
 
-        frameInterval;
-        fpsInterval;
-        lastFpsTime;
-        rom;
-        lastFrameTime;
+        frameInterval: number;
+        fpsInterval: number;
+        lastFpsTime: number;
+        rom: ROM;
+        lastFrameTime: number;
 
         constructor(opts: Options) {
             this.opts = opts;
@@ -48,19 +48,17 @@ module NES.TS
         }
 
         start() {
-            var self = this;
-
             if (this.rom !== null && this.rom.valid) {
                 if (!this.isRunning) {
                     this.isRunning = true;
 
-                    this.frameInterval = setInterval(function () {
-                        self.frame();
+                    this.frameInterval = setInterval(() => {
+                        this.frame();
                     }, this.frameTime);
                     this.resetFps();
                     this.printFps();
-                    this.fpsInterval = setInterval(function () {
-                        self.printFps();
+                    this.fpsInterval = setInterval(() => {
+                        this.printFps();
                     }, this.opts.fpsInterval);
                 }
             }
@@ -157,7 +155,7 @@ module NES.TS
 
         // Loads a ROM file into the CPU and PPU.
         // The ROM file is validated first.
-        loadRom(data) {
+        loadRom(data: string) {
             if (this.isRunning) {
                 this.stop();
             }
@@ -191,10 +189,10 @@ module NES.TS
             this.fpsFrameCount = 0;
         }
 
-        setFramerate(rate) {
+        setFramerate(rate: number) {
             this.opts.preferredFrameRate = rate;
             this.frameTime = 1000 / rate;
-            this.papu.setSampleRate(this.opts.sampleRate, false);
+            //this.papu.setSampleRate(this.opts.sampleRate, false);
         }
 
         toJSON() {

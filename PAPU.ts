@@ -88,7 +88,7 @@ module NES.TS {
         // Panning:
         panning = [80, 170, 100, 150, 128];
 
-        constructor(nes) {
+        constructor(nes: NES) {
             this.nes = nes;
             this.audioPlayer = new AudioPlayer();
 
@@ -174,7 +174,7 @@ module NES.TS {
             this.minSample = 500000;
         }
 
-        readReg(address) {
+        readReg(address: number) {
             // Read 0x4015:
             var tmp = 0;
             tmp |= (this.square1.getLengthStatus());
@@ -191,7 +191,7 @@ module NES.TS {
             return tmp & 0xFFFF;
         }
 
-        writeReg(address, value) {
+        writeReg(address: number, value: number) {
             if (address >= 0x4000 && address < 0x4004) {
                 // Square Wave 1 Control
                 this.square1.writeReg(address, value);
@@ -277,7 +277,7 @@ module NES.TS {
         // channel enable register (0x4015),
         // and when the user enables/disables channels
         // in the GUI.
-        updateChannelEnable(value) {
+        updateChannelEnable(value: number) {
             this.channelEnableValue = value & 0xFFFF;
             this.square1.setEnabled((value & 1) !== 0);
             this.square2.setEnabled((value & 2) !== 0);
@@ -290,7 +290,7 @@ module NES.TS {
         // twice the cpu speed, so the cycles will be
         // divided by 2 for those counters that are
         // clocked at cpu speed.
-        clockFrameCounter(nCycles) {
+        clockFrameCounter(nCycles: number) {
             if (this.initCounter > 0) {
                 if (this.initingHardware) {
                     this.initCounter -= nCycles;
@@ -456,7 +456,7 @@ module NES.TS {
             }
         }
 
-        accSample(cycles) {
+        accSample(cycles: number) {
             // Special treatment for triangle channel - need to interpolate.
             if (this.triangle.sampleCondition) {
                 this.triValue = Math.floor((this.triangle.progTimerCount << 4) /
@@ -502,14 +502,12 @@ module NES.TS {
         }
 
         frameCounterTick() {
-
             this.derivedFrameCounter++;
             if (this.derivedFrameCounter >= this.frameIrqCounterMax) {
                 this.derivedFrameCounter = 0;
             }
 
             if (this.derivedFrameCounter === 1 || this.derivedFrameCounter === 3) {
-
                 // Clock length & sweep:
                 this.triangle.clockLengthCounter();
                 this.square1.clockLengthCounter();
@@ -517,31 +515,22 @@ module NES.TS {
                 this.noise.clockLengthCounter();
                 this.square1.clockSweep();
                 this.square2.clockSweep();
-
             }
 
             if (this.derivedFrameCounter >= 0 && this.derivedFrameCounter < 4) {
-
                 // Clock linear & decay:            
                 this.square1.clockEnvDecay();
                 this.square2.clockEnvDecay();
                 this.noise.clockEnvDecay();
                 this.triangle.clockLinearCounter();
-
             }
 
             if (this.derivedFrameCounter === 3 && this.countSequence === 0) {
-
                 // Enable IRQ:
                 this.frameIrqActive = true;
-
             }
-
-
             // End of 240Hz tick
-
         }
-
 
         // Samples the channels, mixes the output together,
         // writes to buffer and (if enabled) file.
@@ -650,18 +639,18 @@ module NES.TS {
 
         }
 
-        getLengthMax(value) {
+        getLengthMax(value: number) {
             return this.lengthLookup[value >> 3];
         }
 
-        getDmcFrequency(value) {
+        getDmcFrequency(value: number) {
             if (value >= 0 && value < 0x10) {
                 return this.dmcFreqLookup[value];
             }
             return 0;
         }
 
-        getNoiseWaveLength(value) {
+        getNoiseWaveLength(value: number) {
             if (value >= 0 && value < 0x10) {
                 return this.noiseWavelengthLookup[value];
             }
@@ -675,7 +664,7 @@ module NES.TS {
             this.updateStereoPos();
         }
 
-        setMasterVolume(value) {
+        setMasterVolume(value: number) {
             if (value < 0) {
                 value = 0;
             }
@@ -810,20 +799,20 @@ module NES.TS {
 
 
     class ChannelDM {
-        papu;
+        papu: PAPU;
 
         MODE_NORMAL = 0;
         MODE_LOOP = 1;
         MODE_IRQ = 2;
 
-        isEnabled = null;
-        hasSample = null;
+        isEnabled: boolean;
+        hasSample: boolean;
         irqGenerated = false;
 
-        playMode = null;
+        playMode: number;
         dmaFrequency = null;
-        dmaCounter = null;
-        deltaCounter = null;
+        dmaCounter: number;
+        deltaCounter: number;
         playStartAddress = null;
         playAddress = null;
         playLength = null;
@@ -835,7 +824,7 @@ module NES.TS {
         dacLsb = null;
         data = null;
 
-        constructor(papu) {
+        constructor(papu: PAPU) {
             this.papu = papu;
             this.reset();
         }
@@ -864,7 +853,6 @@ module NES.TS {
 
                 // Update shift register:
                 this.data >>= 1;
-
             }
 
             this.dmaCounter--;
@@ -921,7 +909,7 @@ module NES.TS {
             this.hasSample = true;
         }
 
-        writeReg(address, value) {
+        writeReg(address: number, value: number) {
             if (address === 0x4010) {
 
                 // Play mode, DMA Frequency
@@ -982,7 +970,7 @@ module NES.TS {
             }
         }
 
-        setEnabled(value) {
+        setEnabled(value: boolean) {
             if ((!this.isEnabled) && value) {
                 this.playLengthCounter = this.playLength;
             }
@@ -1018,31 +1006,31 @@ module NES.TS {
     } //class ChannelDM
 
     class ChannelNoise {
-        papu;
+        papu: PAPU;
 
-        isEnabled = null;
-        envDecayDisable = null;
-        envDecayLoopEnable = null;
-        lengthCounterEnable = null;
+        isEnabled: boolean;
+        envDecayDisable: boolean;
+        envDecayLoopEnable: boolean;
+        lengthCounterEnable: boolean;
         envReset = null;
         shiftNow = null;
 
-        lengthCounter = null;
-        progTimerCount = null;
-        progTimerMax = null;
-        envDecayRate = null;
-        envDecayCounter = null;
-        envVolume = null;
-        masterVolume = null;
+        lengthCounter: number;
+        progTimerCount: number;
+        progTimerMax: number;
+        envDecayRate: number;
+        envDecayCounter: number;
+        envVolume: number;
+        masterVolume: number;
         shiftReg = 1 << 14;
-        randomBit = null;
-        randomMode = null;
-        sampleValue = null;
+        randomBit: number;
+        randomMode: number;
+        sampleValue: number;
         accValue = 0;
         accCount = 1;
-        tmp = null;
+        tmp: number;
 
-        constructor(papu) {
+        constructor(papu: PAPU) {
             this.papu = papu;
 
             this.isEnabled = null;
@@ -1126,7 +1114,7 @@ module NES.TS {
             }
         }
 
-        writeReg(address, value) {
+        writeReg(address: number, value: number) {
             if (address === 0x400C) {
                 // Volume/Envelope decay:
                 this.envDecayDisable = ((value & 0x10) !== 0);
@@ -1149,7 +1137,7 @@ module NES.TS {
             //updateSampleValue();
         }
 
-        setEnabled(value) {
+        setEnabled(value: boolean) {
             this.isEnabled = value;
             if (!value) {
                 this.lengthCounter = 0;
@@ -1163,7 +1151,7 @@ module NES.TS {
     } // class ChannelNoise
 
     class ChannelSquare {
-        papu;
+        papu: PAPU;
 
         dutyLookup = [
             0, 1, 0, 0, 0, 0, 0, 0,
@@ -1179,33 +1167,33 @@ module NES.TS {
         ];
 
         sqr1;
-        isEnabled = null;
-        lengthCounterEnable = null;
-        sweepActive = null;
-        envDecayDisable = null;
-        envDecayLoopEnable = null;
+        isEnabled: boolean;
+        lengthCounterEnable: boolean;
+        sweepActive: boolean;
+        envDecayDisable: boolean;
+        envDecayLoopEnable: boolean;
         envReset = null;
         sweepCarry = null;
         updateSweepPeriod = null;
 
-        progTimerCount = null;
-        progTimerMax = null;
-        lengthCounter = null;
-        squareCounter = null;
-        sweepCounter = null;
-        sweepCounterMax = null;
-        sweepMode = null;
-        sweepShiftAmount = null;
-        envDecayRate = null;
-        envDecayCounter = null;
-        envVolume = null;
-        masterVolume = null;
-        dutyMode = null;
+        progTimerCount: number;
+        progTimerMax: number;
+        lengthCounter: number;
+        squareCounter: number;
+        sweepCounter: number;
+        sweepCounterMax: number;
+        sweepMode: number;
+        sweepShiftAmount: number;
+        envDecayRate: number;
+        envDecayCounter: number;
+        envVolume: number;
+        masterVolume: number;
+        dutyMode: number;
         sweepResult = null;
         sampleValue = null;
-        vol = null;
+        vol: number;
 
-        constructor(papu, square1) {
+        constructor(papu: PAPU, square1) {
             this.papu = papu;
             this.sqr1 = square1;
             this.reset();
@@ -1304,7 +1292,7 @@ module NES.TS {
             }
         }
 
-        writeReg(address, value) {
+        writeReg(address: number, value: number) {
             var addrAdd = (this.sqr1 ? 0 : 4);
             if (address === 0x4000 + addrAdd) {
                 // Volume/Envelope decay:
@@ -1343,7 +1331,7 @@ module NES.TS {
             }
         }
 
-        setEnabled(value) {
+        setEnabled(value: boolean) {
             this.isEnabled = value;
             if (!value) {
                 this.lengthCounter = 0;
@@ -1357,24 +1345,24 @@ module NES.TS {
     }
 
     class ChannelTriangle {
-        papu;
+        papu: PAPU;
 
-        isEnabled = null;
-        sampleCondition = null;
-        lengthCounterEnable = null;
-        lcHalt = null;
-        lcControl = null;
+        isEnabled: boolean;
+        sampleCondition: boolean;
+        lengthCounterEnable: boolean;
+        lcHalt: boolean;
+        lcControl: boolean;
 
-        progTimerCount = null;
-        progTimerMax = null;
-        triangleCounter = null;
-        lengthCounter = null;
-        linearCounter = null;
-        lcLoadValue = null;
-        sampleValue = null;
-        tmp = null;
+        progTimerCount: number;
+        progTimerMax: number;
+        triangleCounter: number;
+        lengthCounter: number;
+        linearCounter: number;
+        lcLoadValue: number;
+        sampleValue: number;
+        tmp: number;
 
-        constructor(papu) {
+        constructor(papu: PAPU) {
             this.papu = papu;
             this.reset();
         }
@@ -1425,11 +1413,11 @@ module NES.TS {
             return ((this.lengthCounter === 0 || !this.isEnabled) ? 0 : 1);
         }
 
-        readReg(address) {
+        readReg(address: number) {
             return 0;
         }
 
-        writeReg(address, value) {
+        writeReg(address: number, value: number) {
             if (address === 0x4008) {
                 // New values for linear counter:
                 this.lcControl = (value & 0x80) !== 0;
@@ -1455,7 +1443,7 @@ module NES.TS {
             this.updateSampleCondition();
         }
 
-        clockProgrammableTimer(nCycles) {
+        clockProgrammableTimer(nCycles: number) {
             if (this.progTimerMax > 0) {
                 this.progTimerCount += nCycles;
                 while (this.progTimerMax > 0 &&
@@ -1474,7 +1462,7 @@ module NES.TS {
             this.triangleCounter &= 0x1F;
         }
 
-        setEnabled(value) {
+        setEnabled(value: boolean) {
             this.isEnabled = value;
             if (!value) {
                 this.lengthCounter = 0;

@@ -17,7 +17,7 @@ interface Document {
 
 module NES.TS {
     export class UI {
-        nes;
+        nes: NES;
         root: HTMLDivElement;
         screen: HTMLCanvasElement;
         romContainer: HTMLDivElement;
@@ -31,7 +31,7 @@ module NES.TS {
         status: HTMLParagraphElement;
         zoomed = false;
         canvasContext: CanvasRenderingContext2D;
-        canvasImageData;
+        canvasImageData: ImageData;
 
         constructor(parent: HTMLDivElement, roms) {
             var self = this;

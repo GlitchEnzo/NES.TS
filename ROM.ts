@@ -1,6 +1,6 @@
 module NES.TS {
     export class ROM {
-        nes;
+        nes: NES;
         mapperName: string[];
 
         header = null;
@@ -27,7 +27,7 @@ module NES.TS {
         SINGLESCREEN_MIRRORING4 = 6;
         CHRROM_MIRRORING = 7;
 
-        constructor(nes) {
+        constructor(nes: NES) {
             this.nes = nes;
 
             this.mapperName = new Array(92);
@@ -189,7 +189,7 @@ module NES.TS {
             return this.mapperType == 0 || this.mapperType == 1 || this.mapperType == 2 || this.mapperType == 4;
         }
 
-        createMapper() {
+        createMapper(): Mapper {
             if (this.mapperSupported()) {
                 switch (this.mapperType) {
                     case 0: return new MapperZero(this.nes);

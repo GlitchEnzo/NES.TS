@@ -4,7 +4,7 @@ module NES.TS {
     *         and other video-oriented features.
     */
     export class PPU {
-        nes;
+        nes: NES;
         vramMem = null;
         spriteMem = null;
         vramAddress = null;
@@ -79,7 +79,7 @@ module NES.TS {
         srcy1;
         srcy2;
 
-        constructor(nes) {
+        constructor(nes: NES) {
             this.nes = nes;
             this.reset();
         }

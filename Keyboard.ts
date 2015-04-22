@@ -25,7 +25,7 @@ module NES.TS
             }
         }
 
-        setKey(key, value) 
+        setKey(key: number, value: number) 
         {
             switch (key) {
                 case 88: this.state1[this.keys.KEY_A] = value; break;      // X
@@ -51,19 +51,19 @@ module NES.TS
             return false; // preventDefault
         }
 
-        keyDown(evt) {
+        keyDown(evt: KeyboardEvent) {
             if (!this.setKey(evt.keyCode, 0x41) && evt.preventDefault) {
                 evt.preventDefault();
             }
         }
 
-        keyUp(evt) {
+        keyUp(evt: KeyboardEvent) {
             if (!this.setKey(evt.keyCode, 0x40) && evt.preventDefault) {
                 evt.preventDefault();
             }
         }
 
-        keyPress(evt) {
+        keyPress(evt: KeyboardEvent) {
             evt.preventDefault();
         }
     }

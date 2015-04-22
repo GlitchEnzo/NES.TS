@@ -1,13 +1,7 @@
 module NES.TS {
     export class Mapper {
-        nes;
+        nes: NES;
 
-        constructor(nes) {
-            this.nes = nes;
-        }
-    }
-
-    export class MapperZero extends Mapper {
         joy1StrobeState = 0;
         joy2StrobeState = 0;
         joypadLastWrite = 0;
@@ -16,79 +10,126 @@ module NES.TS {
         mouseX = null;
         mouseY = null;
 
-        constructor(nes) {
-            super(nes);
+        constructor(nes: NES) {
+            this.nes = nes;
+        }
+
+        loadROM() {
+            // the specific Mappers will implement this
         }
 
         reset() {
-            this.joy1StrobeState = 0;
-            this.joy2StrobeState = 0;
-            this.joypadLastWrite = 0;
-
-            this.mousePressed = false;
-            this.mouseX = null;
-            this.mouseY = null;
+            // the specific Mappers will implement this
         }
 
-        write(address, value) {
-            if (address < 0x2000) {
-                // Mirroring of RAM:
-                this.nes.cpu.mem[address & 0x7FF] = value;
+        write(address: number, value: number) {
+            // the specific Mappers will implement this
+        }
 
+        load(address: number) {
+            // Wrap around:
+            address &= 0xFFFF;
+
+            // Check address range:
+            if (address > 0x4017) {
+                // ROM:
+                return this.nes.cpu.mem[address];
             }
-            else if (address > 0x4017) {
-                this.nes.cpu.mem[address] = value;
-                if (address >= 0x6000 && address < 0x8000) {
-                    // Write to SaveRAM. Store in file:
-                    // TODO: not yet
-                    //if(this.nes.rom!=null)
-                    //    this.nes.rom.writeBatteryRam(address,value);
-                }
-            }
-            else if (address > 0x2007 && address < 0x4000) {
-                this.regWrite(0x2000 + (address & 0x7), value);
+            else if (address >= 0x2000) {
+                // I/O Ports.
+                return this.regLoad(address);
             }
             else {
-                this.regWrite(address, value);
+                // RAM (mirrored)
+                return this.nes.cpu.mem[address & 0x7FF];
             }
         }
 
-        writelow(address, value) {
-            if (address < 0x2000) {
-                // Mirroring of RAM:
-                this.nes.cpu.mem[address & 0x7FF] = value;
+        joy1Read() {
+            var ret;
+
+            switch (this.joy1StrobeState) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    ret = this.nes.keyboard.state1[this.joy1StrobeState];
+                    break;
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                    ret = 0;
+                    break;
+                case 19:
+                    ret = 1;
+                    break;
+                default:
+                    ret = 0;
             }
-            else if (address > 0x4017) {
-                this.nes.cpu.mem[address] = value;
+
+            this.joy1StrobeState++;
+            if (this.joy1StrobeState == 24) {
+                this.joy1StrobeState = 0;
             }
-            else if (address > 0x2007 && address < 0x4000) {
-                this.regWrite(0x2000 + (address & 0x7), value);
-            }
-            else {
-                this.regWrite(address, value);
-            }
+
+            return ret;
         }
 
-        load(address) {
-                // Wrap around:
-                address &= 0xFFFF;
+        joy2Read() {
+            var ret;
 
-                // Check address range:
-                if (address > 0x4017) {
-                    // ROM:
-                    return this.nes.cpu.mem[address];
-                }
-                else if (address >= 0x2000) {
-                    // I/O Ports.
-                    return this.regLoad(address);
-                }
-                else {
-                    // RAM (mirrored)
-                    return this.nes.cpu.mem[address & 0x7FF];
-                }
+            switch (this.joy2StrobeState) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    ret = this.nes.keyboard.state2[this.joy2StrobeState];
+                    break;
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                    ret = 0;
+                    break;
+                case 19:
+                    ret = 1;
+                    break;
+                default:
+                    ret = 0;
+            }
+
+            this.joy2StrobeState++;
+            if (this.joy2StrobeState == 24) {
+                this.joy2StrobeState = 0;
+            }
+
+            return ret;
         }
 
-        regLoad(address) {
+        regLoad(address: number) {
             switch (address >> 12) { // use fourth nibble (0xF000)
                 case 0:
                     break;
@@ -196,7 +237,84 @@ module NES.TS {
             return 0;
         }
 
-        regWrite(address, value) {
+        latchAccess(address: number) {
+            // Does nothing. This is used by MMC2.
+        }
+
+        clockIrqCounter() {
+            // Does nothing. This is used by the MMC3 mapper.
+        }
+
+        toJSON() {
+            var s;
+            s['joy1StrobeState'] = this.joy1StrobeState;
+            s['joy2StrobeState'] = this.joy2StrobeState;
+            s['joypadLastWrite'] = this.joypadLastWrite;
+            return s;
+        }
+
+        fromJSON(s) {
+            this.joy1StrobeState = s.joy1StrobeState;
+            this.joy2StrobeState = s.joy2StrobeState;
+            this.joypadLastWrite = s.joypadLastWrite;
+        }
+    }
+
+    export class MapperZero extends Mapper {
+        constructor(nes: NES) {
+            super(nes);
+        }
+
+        reset() {
+            this.joy1StrobeState = 0;
+            this.joy2StrobeState = 0;
+            this.joypadLastWrite = 0;
+
+            this.mousePressed = false;
+            this.mouseX = null;
+            this.mouseY = null;
+        }
+
+        write(address: number, value: number) {
+            if (address < 0x2000) {
+                // Mirroring of RAM:
+                this.nes.cpu.mem[address & 0x7FF] = value;
+
+            }
+            else if (address > 0x4017) {
+                this.nes.cpu.mem[address] = value;
+                if (address >= 0x6000 && address < 0x8000) {
+                    // Write to SaveRAM. Store in file:
+                    // TODO: not yet
+                    //if(this.nes.rom!=null)
+                    //    this.nes.rom.writeBatteryRam(address,value);
+                }
+            }
+            else if (address > 0x2007 && address < 0x4000) {
+                this.regWrite(0x2000 + (address & 0x7), value);
+            }
+            else {
+                this.regWrite(address, value);
+            }
+        }
+
+        writelow(address: number, value: number) {
+            if (address < 0x2000) {
+                // Mirroring of RAM:
+                this.nes.cpu.mem[address & 0x7FF] = value;
+            }
+            else if (address > 0x4017) {
+                this.nes.cpu.mem[address] = value;
+            }
+            else if (address > 0x2007 && address < 0x4000) {
+                this.regWrite(0x2000 + (address & 0x7), value);
+            }
+            else {
+                this.regWrite(address, value);
+            }
+        }
+
+        regWrite(address: number, value: number) {
                 switch (address) {
                     case 0x2000:
                         // PPU Control register 1
@@ -269,90 +387,6 @@ module NES.TS {
                 }
         }
 
-        joy1Read() {
-                var ret;
-
-                switch (this.joy1StrobeState) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                        ret = this.nes.keyboard.state1[this.joy1StrobeState];
-                        break;
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                    case 18:
-                        ret = 0;
-                        break;
-                    case 19:
-                        ret = 1;
-                        break;
-                    default:
-                        ret = 0;
-                }
-
-                this.joy1StrobeState++;
-                if (this.joy1StrobeState == 24) {
-                    this.joy1StrobeState = 0;
-                }
-
-                return ret;
-        }
-
-        joy2Read() {
-                var ret;
-
-                switch (this.joy2StrobeState) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                        ret = this.nes.keyboard.state2[this.joy2StrobeState];
-                        break;
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                    case 18:
-                        ret = 0;
-                        break;
-                    case 19:
-                        ret = 1;
-                        break;
-                    default:
-                        ret = 0;
-                }
-
-                this.joy2StrobeState++;
-                if (this.joy2StrobeState == 24) {
-                    this.joy2StrobeState = 0;
-                }
-
-                return ret;
-          }
-
         loadROM() {
                 if (!this.nes.rom.valid || this.nes.rom.romCount < 1) {
                     alert("NoMapper: Invalid ROM! Unable to load.");
@@ -413,7 +447,7 @@ module NES.TS {
                 }
         }
 
-        loadRomBank(bank, address) {
+        loadRomBank(bank: number, address: number) {
                 // Loads a ROM bank into the specified address.
                 bank %= this.nes.rom.romCount;
                 //var data = this.nes.rom.rom[bank];
@@ -421,7 +455,7 @@ module NES.TS {
                 Utils.copyArrayElements(this.nes.rom.rom[bank], 0, this.nes.cpu.mem, address, 16384);
         }
 
-        loadVromBank(bank, address) {
+        loadVromBank(bank: number, address: number) {
                 if (this.nes.rom.vromCount === 0) {
                     return;
                 }
@@ -434,12 +468,12 @@ module NES.TS {
                 Utils.copyArrayElements(vromTile, 0, this.nes.ppu.ptTile, address >> 4, 256);
         }
 
-        load32kRomBank(bank, address) {
+        load32kRomBank(bank: number, address: number) {
                 this.loadRomBank((bank * 2) % this.nes.rom.romCount, address);
                 this.loadRomBank((bank * 2 + 1) % this.nes.rom.romCount, address + 16384);
         }
 
-        load8kVromBank(bank4kStart, address) {
+        load8kVromBank(bank4kStart: number, address: number) {
                 if (this.nes.rom.vromCount === 0) {
                     return;
                 }
@@ -450,7 +484,7 @@ module NES.TS {
                     address + 4096);
         }
 
-        load1kVromBank(bank1k, address) {
+        load1kVromBank(bank1k: number, address: number) {
                 if (this.nes.rom.vromCount === 0) {
                     return;
                 }
@@ -469,7 +503,7 @@ module NES.TS {
                 }
         }
 
-        load2kVromBank(bank2k, address) {
+        load2kVromBank(bank2k: number, address: number) {
                 if (this.nes.rom.vromCount === 0) {
                     return;
                 }
@@ -488,7 +522,7 @@ module NES.TS {
                 }
         }
 
-        load8kRomBank(bank8k, address) {
+        load8kRomBank(bank8k: number, address: number) {
                 var bank16k = Math.floor(bank8k / 2) % this.nes.rom.romCount;
                 var offset = (bank8k % 2) * 8192;
 
@@ -496,33 +530,6 @@ module NES.TS {
                 Utils.copyArrayElements(this.nes.rom.rom[bank16k], offset,
                     this.nes.cpu.mem, address, 8192);
         }
-
-        clockIrqCounter() {
-            // Does nothing. This is used by the MMC3 mapper.
-        }
-
-        latchAccess(address) {
-            // Does nothing. This is used by MMC2.
-        }
-
-        toJSON() {
-            var s;
-            s['joy1StrobeState'] = this.joy1StrobeState;
-            s['joy2StrobeState'] = this.joy2StrobeState;
-            s['joypadLastWrite'] = this.joypadLastWrite;
-            return s;
-            //return {
-            //    'joy1StrobeState': this.joy1StrobeState,
-            //    'joy2StrobeState': this.joy2StrobeState,
-            //    'joypadLastWrite': this.joypadLastWrite
-            //};
-        }
-
-        fromJSON(s) {
-                this.joy1StrobeState = s.joy1StrobeState;
-                this.joy2StrobeState = s.joy2StrobeState;
-                this.joypadLastWrite = s.joypadLastWrite;
-            }
     }
 
     export class MapperOne extends MapperZero {
@@ -574,7 +581,7 @@ module NES.TS {
             this.romBankSelect = 0;
         }
 
-        write(address, value) {
+        write(address: number, value: number) {
             // Writes to addresses other than MMC registers are handled by NoMapper.
             if (address < 0x8000) {
                 super.write(address, value);
@@ -614,7 +621,7 @@ module NES.TS {
             }
         }
 
-        setReg(reg, value) {
+        setReg(reg: number, value: number) {
             var tmp;
 
             switch (reg) {
@@ -760,7 +767,7 @@ module NES.TS {
         }
 
         // Returns the register number from the address written to:
-        getRegNumber(address) {
+        getRegNumber(address: number) {
             if (address >= 0x8000 && address <= 0x9FFF) {
                 return 0;
             }
@@ -793,18 +800,6 @@ module NES.TS {
 
             // Do Reset-Interrupt:
             this.nes.cpu.requestIrq(this.nes.cpu.IRQ_RESET);
-        }
-
-        switchLowHighPrgRom(oldSetting) {
-            // not yet.
-        }
-
-        switch16to32() {
-            // not yet.
-        }
-
-        switch32to16() {
-            // not yet.
         }
 
         toJSON() {
@@ -840,11 +835,11 @@ module NES.TS {
     } // MapperOne
 
     export class MapperTwo extends MapperZero {
-        constructor(nes) {
+        constructor(nes: NES) {
             super(nes);
         }
 
-        write(address, value) {
+        write(address: number, value: number) {
             // Writes to addresses other than MMC registers are handled by NoMapper.
             if (address < 0x8000) {
                 //JSNES.Mappers[0].prototype.write.apply(this, arguments);
@@ -896,11 +891,11 @@ module NES.TS {
         irqEnable = null;
         prgAddressChanged = false;
 
-        constructor(nes) {
+        constructor(nes: NES) {
             super(nes);
         }
 
-        write(address, value) {
+        write(address: number, value: number) {
             // Writes to addresses other than MMC registers are handled by NoMapper.
             if (address < 0x8000) {
                 //JSNES.Mappers[0].prototype.write.apply(this, arguments);
@@ -973,7 +968,7 @@ module NES.TS {
             }
         }
 
-        executeCommand(cmd, arg) {
+        executeCommand(cmd: number, arg: number) {
             switch (cmd) {
                 case this.CMD_SEL_2_1K_VROM_0000:
                     // Select 2 1KB VROM pages at 0x0000:
@@ -1151,8 +1146,5 @@ module NES.TS {
             this.irqEnable = s.irqEnable;
             this.prgAddressChanged = s.prgAddressChanged;
         }
-    }
-
-    export class Mappers {
     }
 } // NES.TS
