@@ -8,6 +8,9 @@
 /// <reference path="ROM.ts" />
 /// <reference path="UI.ts" />
 /// <reference path="AudioPlayer.ts" />
+/// <reference path="Tile.ts" />
+/// <reference path="PaletteTable.ts" />
+/// <reference path="NameTable.ts" />
 
 window.onload = () =>
 {
