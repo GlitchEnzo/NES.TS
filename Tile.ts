@@ -1,42 +1,40 @@
 ﻿module NES.TS {
     export class Tile {
         // Tile data:
-        pix = new Array(64);
+        pix: number[] = new Array(64);
 
-        fbIndex = null;
-        tIndex = null;
-        x = null;
-        y = null;
+        fbIndex: number;
+        tIndex: number;
+        x: number;
+        y: number;
         w = null;
         h = null;
         incX = null;
         incY = null;
-        palIndex = null;
+        palIndex: number;
         tpri = null;
         c = null;
         initialized = false;
         opaque = new Array(8);
 
-        setBuffer(scanline) {
+        setBuffer(scanline: number[]) {
             for (this.y = 0; this.y < 8; this.y++) {
                 this.setScanline(this.y, scanline[this.y], scanline[this.y + 8]);
             }
         }
 
-        setScanline(sline, b1, b2) {
+        setScanline(sline: number, b1: number, b2: number) {
             this.initialized = true;
             this.tIndex = sline << 3;
             for (this.x = 0; this.x < 8; this.x++) {
-                this.pix[this.tIndex + this.x] = ((b1 >> (7 - this.x)) & 1) +
-                (((b2 >> (7 - this.x)) & 1) << 1);
+                this.pix[this.tIndex + this.x] = ((b1 >> (7 - this.x)) & 1) + (((b2 >> (7 - this.x)) & 1) << 1);
                 if (this.pix[this.tIndex + this.x] === 0) {
                     this.opaque[sline] = false;
                 }
             }
         }
 
-        render(buffer, srcx1, srcy1, srcx2, srcy2, dx, dy, palAdd, palette, flipHorizontal, flipVertical, pri, priTable) {
-
+        render(buffer: any[], srcx1: number, srcy1: number, srcx2: number, srcy2: number, dx: number, dy: number, palAdd: number, palette: any[], flipHorizontal: boolean, flipVertical: boolean, pri: number, priTable: any[]) {
             if (dx < -7 || dx >= 256 || dy < -7 || dy >= 240) {
                 return;
             }
@@ -152,7 +150,7 @@
 
         }
 
-        isTransparent(x, y) {
+        isTransparent(x: number, y: number) {
             return (this.pix[(y << 3) + x] === 0);
         }
 

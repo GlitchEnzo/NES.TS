@@ -5,8 +5,8 @@ module NES.TS {
     */
     export class PPU {
         nes: NES;
-        vramMem = null;
-        spriteMem = null;
+        vramMem: number[];
+        spriteMem: number[];
         vramAddress = null;
         vramTmpAddress = null;
         vramBufferedReadValue = null;
@@ -79,19 +79,19 @@ module NES.TS {
         srcy1;
         srcy2;
 
-        constructor(nes: NES) {
-            this.nes = nes;
-            this.reset();
-        }
-
         // Status flags:
         STATUS_VRAMWRITE = 4;
         STATUS_SLSPRITECOUNT = 5;
         STATUS_SPRITE0HIT = 6;
         STATUS_VBLANK = 7;
 
+        constructor(nes: NES) {
+            this.nes = nes;
+            this.reset();
+        }
+
         reset() {
-            var i;
+            var i: number;
 
             // Memory
             this.vramMem = new Array(0x8000);
@@ -1070,7 +1070,7 @@ module NES.TS {
             }
         }
 
-        renderSpritesPartially(startscan, scancount, bgPri) {
+        renderSpritesPartially(startscan: number, scancount: number, bgPri) {
             if (this.f_spVisibility === 1) {
 
                 for (var i = 0; i < 64; i++) {
@@ -1315,7 +1315,7 @@ module NES.TS {
         // This will write to PPU memory, and
         // update internally buffered data
         // appropriately.
-        writeMem(address, value) {
+        writeMem(address: number, value) {
             this.vramMem[address] = value;
 
             // Update internally buffered data:
@@ -1407,7 +1407,7 @@ module NES.TS {
 
         // Updates the internal name table buffers
         // with this new byte.
-        nameTableWrite(index, address, value) {
+        nameTableWrite(index: number, address: number, value) {
             this.nameTable[index].tile[address] = value;
 
             // Update Sprite #0 hit:

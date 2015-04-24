@@ -1,8 +1,8 @@
 ﻿module NES.TS {
     export class PaletteTable {
-        curTable;
-        emphTable;
-        currentEmph;
+        curTable: number[];
+        emphTable: number[][];
+        currentEmph: number;
 
         constructor() {
             this.curTable = new Array(64);
@@ -27,7 +27,14 @@
         }
 
         makeTables() {
-            var r, g, b, col, i, rFactor, gFactor, bFactor;
+            var r: number;
+            var g: number;
+            var b: number;
+            var col: number;
+            var i: number;
+            var rFactor: number;
+            var gFactor: number;
+            var bFactor: number;
 
             // Calculate a table for each possible emphasis setting:
             for (var emph = 0; emph < 8; emph++) {
@@ -63,7 +70,7 @@
             }
         }
 
-        setEmphasis(emph) {
+        setEmphasis(emph: number) {
             if (emph != this.currentEmph) {
                 this.currentEmph = emph;
                 for (var i = 0; i < 64; i++) {
@@ -72,23 +79,23 @@
             }
         }
 
-        getEntry(yiq) {
+        getEntry(yiq: number) {
             return this.curTable[yiq];
         }
 
-        getRed(rgb) {
+        getRed(rgb: number) {
             return (rgb >> 16) & 0xFF;
         }
 
-        getGreen(rgb) {
+        getGreen(rgb: number) {
             return (rgb >> 8) & 0xFF;
         }
 
-        getBlue(rgb) {
+        getBlue(rgb: number) {
             return rgb & 0xFF;
         }
 
-        getRgb(r, g, b) {
+        getRgb(r: number, g: number, b: number) {
             return ((r << 16) | (g << 8) | (b));
         }
 
